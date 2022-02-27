@@ -63,11 +63,6 @@ void detect(uint8_t * buffer, uint8_t * mark_corner, uint8_t * mark_edge, int wi
                 m11 += px[s[d]] * px[s[d]];
                 m12 += px[s[d]] * py[s[d]];
                 m22 += py[s[d]] * py[s[d]];
-                /*
-                if( px[d]*px[d]*py[d]*py[d] - px[d]*py[d]m11*m22 - m12*m12 < 0 ){
-                    printf("
-                }
-                */
             }
             *q = m11*m22 - m12*m12 - kappa * (m11+m22) * (m11+m22);
         }
@@ -90,7 +85,7 @@ void detect(uint8_t * buffer, uint8_t * mark_corner, uint8_t * mark_edge, int wi
                 qe[1] = qe[3] = 255;
             }
             else{
-                // corner;
+                // corner
                 qe[0] = qe[1] = qe[2] = qe[3] = 0;
                 int great = 1;
                 for(int d=0; d<s_len; ++d)
