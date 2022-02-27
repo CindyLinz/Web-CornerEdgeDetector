@@ -58,7 +58,6 @@ void detect(uint8_t * buffer, uint8_t * mark_corner, uint8_t * mark_edge, int wi
         typeof(dy) py = dy;
         for(typeof(r) q=r; q<r_end; ++q, ++px, ++py){
             float m11 = 0, m12 = 0, m22 = 0;
-            int s[] = {-width-1, -width, -width+1, -1, 0, 1, width-1, width, width+1};
             for(int d=0; d<s_len; ++d){
                 m11 += px[s[d]] * px[s[d]];
                 m12 += px[s[d]] * py[s[d]];
@@ -101,6 +100,20 @@ void detect(uint8_t * buffer, uint8_t * mark_corner, uint8_t * mark_edge, int wi
                 qc[2] = 0;
                 qc[0] = qc[3] = 255;
             }
+        }
+
+        for(int w=0; w<=window; ++w){
+            qc = mark_corner;
+            qe = mark_edge;
+            for(int i=0; i<width; ++i, qc+=4, qe+=4)
+                qc[width*w*4+3] = qe[width*w*4+3] = qc[width*(height-1-w)*4+3] = qe[width*(height-1-w)*4+3] = 0;
+        }
+
+        for(int w=0; w<=window; ++w){
+            qc = mark_corner;
+            qe = mark_edge;
+            for(int i=0; i<height; ++i, qc+=width*4, qe+=width*4)
+                qc[w*4+3] = qe[w*4+3] = qc[(width-1-w)*4+3] = qe[(width-1-w)*4+3] = 0;
         }
     }
 
