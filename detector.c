@@ -71,17 +71,17 @@ void detect(uint8_t * buffer, uint8_t * mark_corner, uint8_t * mark_edge, int wi
         typeof(mark_corner) qc = mark_corner;
         typeof(mark_edge) qe = mark_edge;
         for(typeof(r) pr=r; pr<r_end; ++pr, qc+=4, qe+=4){
-            if( -flat < *pr && *pr < flat ){
-                // flat
-                qc[0] = qc[1] = qc[2] = qc[3] = 0;
-                qe[0] = qe[1] = qe[2] = qe[3] = 0;
-            }
-            else if( *pr < 0 ){
+            if( *pr <= -flat ){
                 // edge
                 qc[0] = qc[1] = qc[2] = qc[3] = 0;
 
                 qe[0] = qe[2] = 0;
                 qe[1] = qe[3] = 255;
+            }
+            else if( *pr < flat ){
+                // flat
+                qc[0] = qc[1] = qc[2] = qc[3] = 0;
+                qe[0] = qe[1] = qe[2] = qe[3] = 0;
             }
             else{
                 // corner
