@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 void mono(uint8_t * buffer, int width, int height){
     uint8_t * buffer_end = buffer + width * height * 4;
@@ -64,6 +65,14 @@ void detect(uint8_t * buffer, uint8_t * mark_corner, uint8_t * mark_edge, int wi
                 m22 += py[s[d]] * py[s[d]];
             }
             *q = m11*m22 - m12*m12 - kappa * (m11+m22) * (m11+m22);
+            if( *q <= -flat ){
+                // edge
+                // float lambda = (m11+m22 + sqrtf((m11-m22)*(m11-m22) + m12*m12)) / 2;
+                // y/x = m22/m11
+                *q = atanf(m22/m11) - M_PI_2 - 1e-9;
+            }
+            else if( *q <= flat )
+                *q = 0;
         }
     }
 
@@ -71,14 +80,17 @@ void detect(uint8_t * buffer, uint8_t * mark_corner, uint8_t * mark_edge, int wi
         typeof(mark_corner) qc = mark_corner;
         typeof(mark_edge) qe = mark_edge;
         for(typeof(r) pr=r; pr<r_end; ++pr, qc+=4, qe+=4){
-            if( *pr <= -flat ){
+            if( *pr < 0 ){
                 // edge
                 qc[0] = qc[1] = qc[2] = qc[3] = 0;
 
-                qe[0] = qe[2] = 0;
-                qe[1] = qe[3] = 255;
+                qe[0] = 0;
+                qe[3] = 255;
+
+                qe[1] = (typeof(qe[1])) (fabs(*pr + M_PI_2) / M_PI_2 * 255 +.5);
+                qe[2] = (typeof(qe[1])) ((M_PI_2 - fabs(M_PI_2 + *pr)) / M_PI_2 * 255 +.5);
             }
-            else if( *pr < flat ){
+            else if( *pr == 0 ){
                 // flat
                 qc[0] = qc[1] = qc[2] = qc[3] = 0;
                 qe[0] = qe[1] = qe[2] = qe[3] = 0;
